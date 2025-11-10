@@ -1,3 +1,17 @@
 spring:
   application:
     name: Config Server
+
+  cloud:
+    config:
+      server:
+        vault:
+          host: 127.0.0.1
+          port: 8200
+          scheme: http
+          backend: secret
+          order: 1
+          authentication: token
+          token: hvs.kH0X83Jaq4odoi7agJUHXiZp
+          kv-version: 2
+          default-key: application
