@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: Config Server
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:Chiheb-Ellefi/delivery-system-config.git
+          passphrase: despacito123
+          skip-ssl-validation: true
+          timeout: 4
+          strict-host-key-checking: true
+          force-pull: true
+          delete-untracked-branches: true
+          refresh-rate: 60
+          try-master-branch: false
+          basedir: /home/chihebellefi/Desktop/projects/Delivery_System/code/config
+          order: 2
+          repos:
+            infrastructure:
+              uri: git@github.com:Chiheb-Ellefi/delivery-system-config.git
+              search-paths:
+                - INFRA/{application}
+              pattern:
+                - "gateway*"
+                - "discovery*"
+            business:
+              uri: git@github.com:Chiheb-Ellefi/delivery-system-config.git
+              search-paths:
+                - BL/{application}
+              pattern:
+                - "driver*"
+                - "vehicle*"
+                - "route*"
+        bootstrap: true
+        prefix: /config
+      allow-override: true
+      override-none: true
+
+server:
+  port: 8888
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      access: read_only
+
