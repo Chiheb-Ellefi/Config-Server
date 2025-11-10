@@ -1,9 +1,20 @@
 spring:
-  application:
-    name: Config Server
+  profiles:
+    active: git
   cloud:
     config:
       server:
+        vault:
+          host: 127.0.0.1
+          port: 8200
+          scheme: http
+          backend: secret
+          order: 1
+          authentication: token
+          token: hvs.kH0X83Jaq4odoi7agJUHXiZp
+          kv-version: 2
+          # if any config has foo, its value will be replaced with bar if not it will be added to the final response
+          default-key: application
         git:
           uri: git@github.com:Chiheb-Ellefi/delivery-system-config.git
           passphrase: despacito123
