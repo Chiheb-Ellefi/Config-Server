@@ -1,6 +1,5 @@
 package org.delivery.system.configserver.config;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,34 +18,46 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-   @Value(value = "${security.user.name}")
-private String actuatorUsername;
-    @Value(value = "${security.user.password}")
-private String actuatorPassword;
+
+    @Value("${spring.security.user.name}")
+    private String actuatorUsername;
+
+    @Value("${spring.security.user.password}")
+    private String actuatorPassword;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().authenticated()
+
+                        .requestMatchers("/actuator/health", "/actuator/health/liveness", "/actuator/health/readiness")
+                        .permitAll()
+
+                        .requestMatchers("/actuator/**")
+                        .hasRole("ACTUATOR")
+                        .anyRequest()
+                        .authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
+
                 .build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername(actuatorUsername)
-                .password(actuatorPassword)
-                .roles("ADMIN")
+        String hashedPassword = passwordEncoder().encode(actuatorPassword);
+
+        UserDetails adminUser = User.builder()
+                .username(actuatorUsername)
+                .password(hashedPassword)
+                .roles("ACTUATOR", "ADMIN")
                 .build();
-        return new InMemoryUserDetailsManager(user);
+
+        return new InMemoryUserDetailsManager(adminUser);
     }
 
     @Bean
-    @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
