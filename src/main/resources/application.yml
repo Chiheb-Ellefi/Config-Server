@@ -1,4 +1,8 @@
 spring:
+  security:
+    user:
+      name: ${ACTUATOR_USERNAME:admin}
+      password: ${ACTUATOR_PASSWORD:password}
   profiles:
     active: git
   cloud:
@@ -11,7 +15,7 @@ spring:
           backend: secret
           order: 1
           authentication: ${VAULT_AUTH_METHOD:token}
-          token: ${VAULT_TOKEN}  # Injected via environment variable or k8s secret
+          token: ${VAULT_TOKEN:token}
           kv-version: 2
           default-key: application
         git:
@@ -148,8 +152,3 @@ management:
         enabled: true
 
 
-# Security for actuator endpoints
-security:
-  user:
-    name: ${ACTUATOR_USERNAME:admin}
-    password: ${ACTUATOR_PASSWORD:password}
