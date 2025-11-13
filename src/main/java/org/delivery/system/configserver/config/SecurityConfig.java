@@ -29,18 +29,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-
+                        // Public health endpoints
                         .requestMatchers("/actuator/health", "/actuator/health/liveness", "/actuator/health/readiness")
                         .permitAll()
 
+                        // Secured actuator endpoints
                         .requestMatchers("/actuator/**")
                         .hasRole("ACTUATOR")
-                        .anyRequest()
+
+                        // Config server endpoints - require authentication
+                        .requestMatchers("/config/**", "/**")
                         .authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
-
                 .build();
     }
 
