@@ -1,0 +1,61 @@
+name: Continuous integration
+run-name: "${{ github.event_name }} by @${{ github.actor }} on ${{ github.ref_name }}"
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths:
+      - "src/**"
+      - "pom.xml"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+env:
+  JAVA_VERSION: "25"
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+        with:
+          token: ${{ github.token}}
+          fetch-depth: 1
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        id: jdk
+        uses: actions/setup-java@v6.1.0
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          distribution: temurin
+
+      - name: Check java version
+        run: java --version
+
+      - name: Build & verify
+        run: mvn --batch-mode --update-snapshots verify
+
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: 'test-reports'
+          path: target/surefire-reports
+          if-no-files-found: ignore
+
+
+
+          
+
