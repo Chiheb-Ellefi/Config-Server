@@ -26,14 +26,15 @@ FROM ${BASE_DISTRO}:${JRE_VERSION} AS runtime
 ENV SERVER_PORT=8888
 WORKDIR /app
 
-RUN groupadd -r spring && useradd -r -g spring -u 1001 spring
+RUN groupadd -r spring \
+    && useradd -r -g spring -u 1001 -d /home/spring spring \
+    && mkdir -p /home/spring/.config \
+    && chown -R spring:spring /home/spring
 
-COPY --from=build --chown=spring:spring  /app/target/*.jar app.jar
-
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
 
 USER spring
 EXPOSE ${SERVER_PORT}
-
 HEALTHCHECK  --interval=30s --timeout=10s --start-period=5s --retries=3 \
    CMD curl -f 'https://localhost:${SERVER_PORT}/actuator/health' || exit 1
 ENTRYPOINT ["java", "-jar","app.jar"]
