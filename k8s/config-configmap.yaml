@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: config
+  name: config-server-config
+data:
+  ACTUATOR_USERNAME: "admin"
+  VAULT_HOST: "127.0.0.1"
+  VAULT_PORT: "8200"
+  VAULT_SCHEME: "http"
+  VAULT_AUTH_METHOD: "token"
+  SERVER_PORT: "8888"
+  SSL_ENABLED: "false"
+  SSL_KEYSTORE: "/certs/keystore.p12"
+  SSL_KEY_ALIAS: "tomcat"
+  CONFIG_BASEDIR: "/tmp/config-repo"
+  GIT_URI: "https://github.com/Chiheb-Ellefi/delivery-system-config.git"
