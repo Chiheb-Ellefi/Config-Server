@@ -1,5 +1,24 @@
 spring:
   security:
     user:
-      name: "admin"
-      password: "password"
+      name: test
+      password: test
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://example.com/dummy/config-repo.git
+          clone-on-start: false
+        health:
+          enabled: false
+        encrypt:
+          enabled: false
+
+encrypt:
+  key: test-encryption-key
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
