@@ -3,6 +3,7 @@ spring:
     user:
       name: test
       password: test
+      roles: ACTUATOR
   cloud:
     config:
       server:
