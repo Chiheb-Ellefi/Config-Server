@@ -3,6 +3,7 @@ spring:
     user:
       name: ${ACTUATOR_USERNAME}
       password: ${ACTUATOR_PASSWORD}
+      roles: ACTUATOR
   profiles:
     active: git
   cloud:
