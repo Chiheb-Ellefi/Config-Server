@@ -13,6 +13,8 @@ on:
 
 permissions:
   contents: read
+  security-events: write
+  actions: read
 env:
   JAVA_VERSION: "25"
 defaults:
@@ -55,13 +57,16 @@ jobs:
           exit-code: 1
           severity: 'HIGH,CRITICAL'
 
-      - name: Semantic code analysis
-        uses: github/codeql-action/init/@v4.36.2
+      - name: CodeQL init
+        uses: github/codeql-action/init@v4
         with:
           languages: java
-
-      - name: CodeQL Analysis
-        uses: ./.github/actions/codeql
+          build-mode: manual
+      - name: Build for CodeQL
+        run: mvn -B -DskipTests package
+        shell: bash
+      - name: CodeQL analyze
+        uses: github/codeql-action/analyze@v4
 
   build:
     name: Build and test
