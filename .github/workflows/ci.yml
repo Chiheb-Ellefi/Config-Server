@@ -25,10 +25,18 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code & Setup JDK
-        uses: ./.github/actions/setup
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
         with:
+          token: ${{ github.token}}
           fetch-depth: 0
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        id: jdk
+        uses: actions/setup-java@v6.1.0
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          distribution: temurin
 
       - name: Lint & Static Analysis
         run:  mvn -B checkstyle:check spotbugs:check pmd:check
@@ -61,11 +69,18 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Checkout code & Setup JDK
-        uses: ./.github/actions/setup
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
         with:
-          fetch-depth: 0
-          java-version: 25
+          token: ${{ github.token}}
+          fetch-depth: 1
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        id: jdk
+        uses: actions/setup-java@v6.1.0
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          distribution: temurin
 
       - name: Check java version
         run: java --version
