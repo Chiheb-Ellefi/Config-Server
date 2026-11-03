@@ -1,0 +1,28 @@
+name: setup
+author: ${{github.repository_owner}}
+description: Checkout code & Set up JDK
+
+inputs:
+  fetch-depth:
+    description: Number of commits to fetch.
+    required: false
+    default: '1'
+  java-version:
+    description: Version of the JDK
+    required: false
+    default: '25'
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v7.0.1
+      with:
+        token: ${{ github.token}}
+        fetch-depth: ${{inputs.fetch-depth}}
+    - name: Set up JDK ${{ inputs.java-version }}
+      id: jdk
+      uses: actions/setup-java@v6.1.0
+      with:
+        java-version: ${{ inputs.java-version }}
+        cache: maven
+        distribution: temurin

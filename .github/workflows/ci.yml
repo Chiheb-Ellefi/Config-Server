@@ -22,24 +22,50 @@ concurrency:
   group: ${{github.workflow}}-${{github.ref}}
   cancel-in-progress: true
 jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code & Setup JDK
+        uses: ./.github/actions/setup
+        with:
+          fetch-depth: 0
+
+      - name: Lint & Static Analysis
+        run:  mvn -B checkstyle:check spotbugs:check pmd:check
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+
+      - name: Dependency scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: 1
+          severity: 'HIGH,CRITICAL'
+
+      - name: Semantic code analysis
+        uses: github/codeql-action/init/@v4.36.2
+        with:
+          languages: java
+
+      - name: CodeQL Analysis
+        uses: ./.github/actions/codeql
+
   build:
     name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
+      - name: Checkout code & Setup JDK
+        uses: ./.github/actions/setup
         with:
-          token: ${{ github.token}}
-          fetch-depth: 1
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        id: jdk
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: maven
-          distribution: temurin
+          fetch-depth: 0
+          java-version: 25
 
       - name: Check java version
         run: java --version
