@@ -17,6 +17,7 @@ permissions:
   actions: read
 env:
   JAVA_VERSION: "25"
+  IMAGE_NAME: "ghcr.io/chiheb-ellefi/config-server"
 defaults:
   run:
     shell: bash
@@ -101,7 +102,7 @@ jobs:
           path: target/surefire-reports
           if-no-files-found: ignore
 
-  build-and-push-image:
+  build-and-upload-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -115,7 +116,7 @@ jobs:
         with:
           context: .
           push: false
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          tags: ${{ env.IMAGE_NAME }}:${{ github.sha }}:${{ github.sha }}
           outputs: type=docker,dest=${{ runner.temp }}/image.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
