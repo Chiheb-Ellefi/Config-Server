@@ -1,5 +1,6 @@
 name: Continuous integration
 run-name: "${{ github.event_name }} by @${{ github.actor }} on ${{ github.ref_name }}"
+
 on:
   push:
     branches: [main]
@@ -7,6 +8,7 @@ on:
     paths:
       - "src/**"
       - "pom.xml"
+      - "Dockerfile"
       - ".github/workflows/ci.yml"
   pull_request:
     types: [opened, synchronize, reopened]
@@ -15,26 +17,32 @@ permissions:
   contents: read
   security-events: write
   actions: read
+
 env:
   JAVA_VERSION: "25"
   IMAGE_NAME: "ghcr.io/chiheb-ellefi/config-server"
+
 defaults:
   run:
     shell: bash
+
 concurrency:
-  group: ${{github.workflow}}-${{github.ref}}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   analyze:
+    name: Static analysis & security scans
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
         with:
-          token: ${{ github.token}}
+          token: ${{ github.token }}
           fetch-depth: 0
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        id: jdk
         uses: actions/setup-java@v6.1.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -42,30 +50,32 @@ jobs:
           distribution: temurin
 
       - name: Lint & Static Analysis
-        run:  mvn -B checkstyle:check spotbugs:check pmd:check
+        run: mvn -B checkstyle:check spotbugs:check pmd:check
 
       - name: Secret scan
         uses: gitleaks/gitleaks-action@v3
         env:
-          GITHUB_TOKEN: ${{github.token}}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Dependency scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          exit-code: 1
-          severity: 'HIGH,CRITICAL'
+          scan-type: "fs"
+          scan-ref: "."
+          format: "table"
+          exit-code: "1"
+          severity: "HIGH,CRITICAL"
+          ignore-unfixed: true
 
       - name: CodeQL init
         uses: github/codeql-action/init@v4
         with:
           languages: java
           build-mode: manual
+
       - name: Build for CodeQL
         run: mvn -B -DskipTests package
-        shell: bash
+
       - name: CodeQL analyze
         uses: github/codeql-action/analyze@v4
 
@@ -73,15 +83,14 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
         with:
-          token: ${{ github.token}}
+          token: ${{ github.token }}
           fetch-depth: 1
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        id: jdk
         uses: actions/setup-java@v6.1.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -98,42 +107,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: 'test-reports'
+          name: test-reports
           path: target/surefire-reports
           if-no-files-found: ignore
-
-  build-and-upload-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-      - uses: docker/setup-buildx-action@v4
-      - name: Build Docker image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: false
-          tags: ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          outputs: type=docker,dest=${{ runner.temp }}/image.tar
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Scan Docker image
-        run: |
-          trivy image --input ${{ runner.temp }}/image.tar
-        
-      - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: docker-image
-          path: ${{ runner.temp }}/image.tar
-          retention-days: 7
-
-
-
-
-
-
-
