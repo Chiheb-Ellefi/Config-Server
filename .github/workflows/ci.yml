@@ -2,104 +2,20 @@ name: Continuous integration
 run-name: "${{ github.event_name }} by @${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
-  workflow_call:
+
   pull_request:
     types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
-  security-events: write
-  actions: read
-
-env:
-  JAVA_VERSION: "25"
-  IMAGE_NAME: "ghcr.io/chiheb-ellefi/config-server"
-
-defaults:
-  run:
-    shell: bash
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  analyze:
-    name: Static analysis & security scans
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
-        with:
-          token: ${{ github.token }}
-          fetch-depth: 0
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: maven
-          distribution: temurin
-
-      - name: Lint & Static Analysis
-        run: mvn -B checkstyle:check spotbugs:check pmd:check
-
-      - name: Secret scan
-        uses: gitleaks/gitleaks-action@v3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Dependency scan
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: "fs"
-          scan-ref: "."
-          format: "table"
-          exit-code: "1"
-          severity: "HIGH,CRITICAL"
-          ignore-unfixed: true
-
-      - name: CodeQL init
-        uses: github/codeql-action/init@v4
-        with:
-          languages: java
-          build-mode: manual
-
-      - name: Build for CodeQL
-        run: mvn -B -DskipTests package
-
-      - name: CodeQL analyze
-        uses: github/codeql-action/analyze@v4
-
-  build:
-    name: Build and test
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.1
-        with:
-          token: ${{ github.token }}
-          fetch-depth: 1
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: maven
-          distribution: temurin
-
-      - name: Check java version
-        run: java --version
-
-      - name: Build & verify
-        run: mvn --batch-mode --update-snapshots verify
-
-      - name: Upload test reports on failure
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-reports
-          path: target/surefire-reports
-          if-no-files-found: ignore
+  ci:
+    uses: Chiheb-Ellefi/ci-templates/.github/workflows/java-ci.yml@v1
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    with:
+      java-version: "25"

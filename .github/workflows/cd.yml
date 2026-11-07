@@ -14,81 +14,13 @@ on:
       - "k8s/**"
 
 
-permissions:
-  contents: read
-
-env:
-  IMAGE_NAME: "ghcr.io/chiheb-ellefi/config-server"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-  build-scan-push:
-    needs: ci
-    name: Build, scan and push image
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout release tag
-        uses: actions/checkout@v7.0.1
-
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Generate image tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,format=long
-            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
-
-      - name: Build image locally for scanning
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          pull: true
-          push: false
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:scan
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Scan Docker image
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}:scan
-          format: "table"
-          exit-code: "1"
-          severity: "HIGH,CRITICAL"
-          ignore-unfixed: true
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+  cd:
+    uses: Chiheb-Ellefi/ci-templates/.github/workflows/docker-cd.yml@v1
+    with:
+      image-name: "ghcr.io/chiheb-ellefi/config-server"
