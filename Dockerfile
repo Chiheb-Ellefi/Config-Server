@@ -26,6 +26,10 @@ FROM ${BASE_DISTRO}:${JRE_VERSION} AS runtime
 ENV SERVER_PORT=8888
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade apt libapt-pkg7.0 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd -r spring \
     && useradd -r -g spring -u 1001 -d /home/spring spring \
     && mkdir -p /home/spring/.config \

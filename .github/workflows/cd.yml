@@ -61,6 +61,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          pull: true
           push: false
           load: true
           tags: ${{ env.IMAGE_NAME }}:scan
