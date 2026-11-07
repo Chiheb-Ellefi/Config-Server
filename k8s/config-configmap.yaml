@@ -4,7 +4,6 @@ metadata:
   namespace: config
   name: config-server-config
 data:
-  ACTUATOR_USERNAME: "admin"
   VAULT_HOST: "127.0.0.1"
   VAULT_PORT: "8200"
   VAULT_SCHEME: "http"
