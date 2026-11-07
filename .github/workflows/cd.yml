@@ -12,9 +12,6 @@ on:
       - "Dockerfile"
       - ".github/workflows/**"
       - "k8s/**"
-
-
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
