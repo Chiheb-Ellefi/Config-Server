@@ -16,8 +16,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   cd:
-    uses: Chiheb-Ellefi/ci-templates/.github/workflows/docker-cd.yml@v1
+    uses: Chiheb-Ellefi/ci-templates/.github/workflows/docker-cd.yml@v2
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     with:
       image-name: "ghcr.io/chiheb-ellefi/config-server"

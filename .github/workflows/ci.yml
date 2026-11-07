@@ -10,9 +10,14 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   ci:
-    uses: Chiheb-Ellefi/ci-templates/.github/workflows/java-ci.yml@v1
+    uses: Chiheb-Ellefi/ci-templates/.github/workflows/java-ci.yml@v2
     permissions:
       contents: read
       security-events: write
