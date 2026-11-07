@@ -10,8 +10,8 @@ on:
       - "src/**"
       - "pom.xml"
       - "Dockerfile"
-      - ".github"
-  workflow_call:
+      - ".github/workflows/**"
+      - "k8s/**"
 
 
 permissions:
@@ -21,7 +21,7 @@ env:
   IMAGE_NAME: "ghcr.io/chiheb-ellefi/config-server"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.release.tag_name }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
