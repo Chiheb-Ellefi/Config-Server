@@ -2,14 +2,6 @@ name: Continuous integration
 run-name: "${{ github.event_name }} by @${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
-  push:
-    branches: [main]
-    tags: ["v*"]
-    paths:
-      - "src/**"
-      - "pom.xml"
-      - "Dockerfile"
-      - ".github/workflows/ci.yml"
   pull_request:
     types: [opened, synchronize, reopened]
 
