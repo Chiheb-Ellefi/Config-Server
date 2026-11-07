@@ -20,10 +20,11 @@ permissions:
   contents: read
   security-events: write
   actions: read
+  packages: write
 
 jobs:
   cd:
-    uses: Chiheb-Ellefi/ci-templates/.github/workflows/docker-cd.yml@v2
+    uses: Chiheb-Ellefi/ci-templates/.github/workflows/docker-cd.yml@v2.0.1
     permissions:
       contents: read
       security-events: write
