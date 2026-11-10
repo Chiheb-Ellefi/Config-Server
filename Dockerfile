@@ -13,9 +13,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline
-
+RUN chmod +x mvnw && ./mvnw dependency:go-offline
 COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
@@ -26,6 +24,7 @@ FROM ${BASE_DISTRO}:${JRE_VERSION} AS runtime
 ENV SERVER_PORT=8888
 WORKDIR /app
 
+# hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --only-upgrade apt libapt-pkg7.0 \
     && rm -rf /var/lib/apt/lists/*
