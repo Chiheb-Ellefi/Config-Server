@@ -19,7 +19,6 @@ RUN ./mvnw clean package -DskipTests
 
 #------- Stage 2 : Runtime --------
 
-
 FROM ${BASE_DISTRO}:${JRE_VERSION} AS runtime
 ENV SERVER_PORT=8888
 WORKDIR /app
