@@ -166,7 +166,7 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-      distribution: :
+      distribution:
         percentiles_histogram:
           http.server.requests: true
         slo:
