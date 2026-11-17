@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: config
-          image: "ghcr.io/chiheb-ellefi/config-server:1.0.2"
+          image: "ghcr.io/chiheb-ellefi/config-server:1.0.3"
           imagePullPolicy: IfNotPresent
           ports:
             - name: "http"
