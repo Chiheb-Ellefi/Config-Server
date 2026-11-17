@@ -32,8 +32,8 @@ spec:
     spec:
       containers:
         - name: config
-          image: "config:1.0.1"
-          imagePullPolicy: Never
+          image: "ghcr.io/chiheb-ellefi/config-server:1.0.2"
+          imagePullPolicy: IfNotPresent
           ports:
             - name: "http"
               containerPort: 8888
