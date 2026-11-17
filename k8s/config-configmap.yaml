@@ -14,3 +14,4 @@ data:
   SSL_KEY_ALIAS: "tomcat"
   CONFIG_BASEDIR: "/tmp/config-repo"
   GIT_URI: "https://github.com/Chiheb-Ellefi/delivery-system-config.git"
+  MANAGEMENT_PORT: "9090"
