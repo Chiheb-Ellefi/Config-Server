@@ -38,6 +38,9 @@ spec:
             - name: "http"
               containerPort: 8888
               protocol: TCP
+            - name: "management"
+              containerPort: 9090
+              protocol: TCP
           envFrom:
             - configMapRef:
                 name: config-server-config
@@ -113,4 +116,4 @@ spec:
 
     - name: management
       port: 9090
-      targetPort: 9090
+      targetPort: management
