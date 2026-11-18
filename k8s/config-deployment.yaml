@@ -57,14 +57,14 @@ spec:
               ephemeral-storage: "2Gi"
           startupProbe:
             httpGet:
-              port: http
+              port: management
               path: "/actuator/health/liveness"
               scheme: HTTP
             periodSeconds: 5
             failureThreshold: 30
           livenessProbe:
             httpGet:
-              port: http
+              port: management
               scheme: HTTP
               path: "/actuator/health/liveness"
             periodSeconds: 10
@@ -72,7 +72,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              port: http
+              port: management
               scheme: HTTP
               path: "/actuator/health/readiness"
             periodSeconds: 5

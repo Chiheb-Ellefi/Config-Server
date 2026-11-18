@@ -1,19 +1,25 @@
 apiVersion: networking.k8s.io/v1
-kind: Ingress
+kind: NetworkPolicy
 metadata:
-  name: config-ingress
+  name: config-server-ingress
   namespace: config
 
 spec:
-  ingressClassName: nginx
-  rules:
-    - host: config.local
-      http:
-        paths:
-          - backend:
-              service:
-                name: config-service
-                port:
-                  number: 8888
-            path: /
-            pathType: Prefix
+  podSelector:
+    matchLabels:
+      app: config-service
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              config-access: "true"
+      ports:
+        - port: 8888
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9090
+
