@@ -1,11 +1,6 @@
 spring:
   application:
     name: Config Server
-  security:
-    user:
-      name: ${ACTUATOR_USERNAME}
-      password: ${ACTUATOR_PASSWORD}
-      roles: ACTUATOR
   profiles:
     active: git
   cloud:
@@ -127,6 +122,24 @@ spring:
         max-interval: 2000
         max-attempts: 6
         multiplier: 1.1
+
+#-----------CONFIG SERVER USERS--------------------#
+
+config-server:
+  security:
+    users:
+      gateway:
+        password: ${GATEWAY_PASSWORD}
+        roles: CONFIG_CLIENT
+      auth-service:
+        password: ${AUTH_SERVICE_PASSWORD}
+        roles: CONFIG_CLIENT
+      registry:
+        password: ${REGISTRY_PASSWORD}
+        roles: CONFIG_CLIENT
+      actuator:
+        password: ${ACTUATOR_PASSWORD}
+        roles: ACTUATOR
 
 server:
   port: ${SERVER_PORT}
