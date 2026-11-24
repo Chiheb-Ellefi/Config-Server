@@ -1,9 +1,4 @@
 spring:
-  security:
-    user:
-      name: test
-      password: test
-      roles: ACTUATOR
   cloud:
     config:
       server:
@@ -14,6 +9,16 @@ spring:
           enabled: false
         encrypt:
           enabled: false
+
+config-server:
+  security:
+    users:
+      gateway:
+        password: test
+        roles: CONFIG_CLIENT
+      actuator:
+        password: test
+        roles: ACTUATOR
 
 encrypt:
   key: test-encryption-key
